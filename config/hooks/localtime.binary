@@ -1,0 +1,26 @@
+#!/bin/sh
+
+ZONEDIR=/usr/share/zoneinfo/
+
+_CMNDLINE=`cat /proc/cmdline`
+
+for _PARAMETER in ${_CMDLINE}
+do
+	case "${_PARAMETER}" in
+	    timezone=*)
+		TIMEZONE=${_PARAMETER#timezone=}
+	    ;;
+	esac
+done
+
+
+if [ -n $TIMEZONE ];
+then
+    sudo rm -f /etc/localtime
+    sudo ln -s $ZONEDIR$TIMEZONE /etc/localtime
+fi
+
+sudo ntpdate 0.ru.pool.ntp.org
+
+
+

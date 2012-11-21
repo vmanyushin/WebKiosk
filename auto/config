@@ -1,0 +1,17 @@
+#!/bin/sh
+
+lb config noauto \
+	-b net \
+	-k 686 \
+	-a i386 \
+	--parent-archive-areas "main contrib non-free" \
+	--debian-installer false \
+	--debian-installer-gui false \
+	--syslinux-theme live-build \
+	--apt-indices false \
+	--archive-areas "main contrib non-free" \
+	--apt-recommends false \
+	--memtest none \
+	--source false \
+	--archives live \
+	${@}

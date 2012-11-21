@@ -1,0 +1,4 @@
+# DO NOT EDIT OR REMOVE
+# This file is a simple placeholder to keep dpkg from removing this directory
+
+@reboot root /usr/sbin/ntpdate 0.ru.pool.ntp.org
