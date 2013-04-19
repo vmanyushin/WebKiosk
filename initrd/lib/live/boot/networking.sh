@@ -8,10 +8,10 @@ do_netsetup ()
 
 	udevadm trigger
 	udevadm settle
-	
-	DEVICE=eth0
 
-	[ -n "$ETHDEV_TIMEOUT" ] || ETHDEV_TIMEOUT=15
+	[ -n "$ETHDEV_TIMEOUT" ] || ETHDEV_TIMEOUT=60
+	[ -n "$ETHDEVICE" ] || ETHDEVICE=eth0
+	
 	echo "Using timeout of $ETHDEV_TIMEOUT seconds for network configuration."
 
 	if [ -z "${NETBOOT}" ] && [ -z "${FETCH}" ] && [ -z "${HTTPFS}" ] && [ -z "${FTPFS}" ]
@@ -78,7 +78,7 @@ do_netsetup ()
 				fi
 			done
 		fi
-
+		
 		# split args of ethdevice=eth0,eth1 into "eth0 eth1"
 		for device in $(echo $ETHDEVICE | sed 's/,/ /g')
 		do
@@ -91,14 +91,7 @@ do_netsetup ()
 		for dev in $devlist $devlist $devlist
 		do
 			echo "Executing ipconfig -t $ETHDEV_TIMEOUT $dev"
-			ipconfig -t "$ETHDEV_TIMEOUT" $dev | tee -a /netboot.config &
-			jobid=$!
-			sleep "$ETHDEV_TIMEOUT" ; sleep 1
-			if [ -r /proc/"$jobid"/status ]
-			then
-				echo "Killing job $jobid for device $dev as ipconfig ran into recursion..."
-				kill -9 $jobid
-			fi
+			ipconfig -t $ETHDEV_TIMEOUT $dev | tee -a /netboot.config
 
 			# if configuration of device worked we should have an assigned
 			# IP address, if so let's use the device as $DEVICE for later usage.
@@ -110,7 +103,7 @@ do_netsetup ()
 			fi
 		done
 	else
-		for interface in ${DEVICE}; do
+		for interface in ${ETHDEVICE}; do
 			ipconfig -t "$ETHDEV_TIMEOUT" ${interface} | tee /netboot-${interface}.config
 			[ -e /tmp/net-${interface}.conf ] && . /tmp/net-${interface}.conf
 			if [ "$IPV4ADDR" != "0.0.0.0" ]
